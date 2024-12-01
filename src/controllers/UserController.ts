@@ -16,71 +16,65 @@ export class UserController {
     try {
       const payload: UserRegisterDTO = req.body;
       const user = await userService.register(payload);
-      created(res, user);   
+      created(res, user);
     } catch (error) {
-        return_error(error, res)
+      return_error(error, res)
     }
   }
 
-  async loginUser(req: Request, res: Response){
+  async loginUser(req: Request, res: Response) {
     try {
-        const payload: UserLoginDto = req.body
-        const token = await userService.login(payload)
-        success(res, token)
+      const payload: UserLoginDto = req.body
+      const token = await userService.login(payload)
+      success(res, token)
     } catch (error) {
-        return_error(error, res)
+      return_error(error, res)
     }
   }
-  
-  async detailUser(req: Request, res: Response){
+
+  async detailUser(req: Request, res: Response) {
     try {
       const user = req.user
-      if(user){
+      if (user) {
         const data = await userService.detail(user)
         success(res, data)
-      }else {
+      } else {
         wrong_credentials(res)
       }
     } catch (error) {
       return_error(error, res)
     }
   }
-  async forgetPassword(req: Request, res: Response){
+  async forgetPassword(req: Request, res: Response) {
     try {
-      const user = req.user
-      if(user){
-        const payload: UserForgotPasswordDto = req.body
-        const data = await userService.forget(payload)
-        success(res, data)
-      }else {
-        wrong_credentials(res)
-      }
+      const data = await userService.forget(req.body)
+      success(res, data)
     } catch (error) {
       return_error(error, res)
     }
   }
-  async updateUser(req: Request, res: Response){
+  async updateUser(req: Request, res: Response) {
     try {
       const user = req.user
-      if(user){
+      if (user) {
         const payload: UserUpdateProfileDTO = req.body
         const data = await userService.update(payload, user)
         success(res, data)
-      }else {
+      } else {
         wrong_credentials(res)
       }
     } catch (error) {
       return_error(error, res)
     }
   }
-  async changeUserPassword(req: Request, res: Response){
+  async changeUserPassword(req: Request, res: Response) {
     try {
       const user = req.user
-      if(user){
+      if (user) {
         const payload: UserChangePasswordDTO = req.body
         const data = await userService.changePassword(payload, user)
         success(res, data)
-      }else {
+      } else {
         wrong_credentials(res)
       }
     } catch (error) {

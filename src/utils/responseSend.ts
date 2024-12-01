@@ -39,3 +39,6 @@ export const not_found = <T>(res: Response, data?: T) : Response<ApiResponse<T>>
 export const wrong_credentials = <T>(res: Response, data?: T) : Response<ApiResponse<T>> => {
     return sendResponse(res, 401, 'error', data, 'Wrong Credentials')
 }
+export const conflict_data = <T>(res: Response, data?: T) : Response<ApiResponse<T>> => {
+    return sendResponse(res, 409, 'error', data, 'Email already exists')
+}

@@ -10,9 +10,19 @@ import { throw_error } from "../utils/throwError";
 import { UserForgotPasswordDto } from "../dto/users/forgotPassword";
 import { UserUpdateProfileDTO } from "../dto/users/updateProfile";
 import { UserChangePasswordDTO } from "../dto/users/changePassword";
+import { Subscriptions } from "../models/Subscription";
+import { Conflict } from "../common/errors/ConflictData";
 export class UserService {
     async register(payload: UserRegisterDTO): Promise<User>{
         try {
+            const emailExist = await User.findOne({
+                where: {
+                    email: payload.email
+                }
+            })
+            if(emailExist) {
+                throw new Conflict()
+            }
             const newUser = await User.create({
                 fullName: payload.fullName,
                 email: payload.email,
@@ -32,10 +42,19 @@ export class UserService {
                     exclude: ['password', 'deletedAt']
                 }
             })
+            await Subscriptions.create({
+                startedAt: moment().toDate(),
+                endedAt: moment().add(1, 'years').toDate(),
+                isValid: true,
+                price: 1,
+                transferProof: 'SYSTEM',
+                userId: user?.id,
+                validatedAt: moment().toDate()
+            })
             return user!
         } catch (error) {
             console.log(error)
-            throw new Error()
+            throw error
         }
     }
     async login(payload: UserLoginDto) {
@@ -68,7 +87,7 @@ export class UserService {
                 user:userFormatted
             }
         } catch (error) {
-            throw_error(error)
+            throw error
         }
     }
     async detail(user: User) {
@@ -83,11 +102,12 @@ export class UserService {
             })
             return userDetail
         } catch (error) {
-            throw_error(error)
+            throw error
         }
     }
     async forget(payload: UserForgotPasswordDto) {
         try {
+            console.log({payload})
             const user = await User.findOne({
                 where: {
                     email: payload.email
@@ -111,7 +131,7 @@ export class UserService {
             })
             return updatedUser
         } catch (error) {
-            throw_error(error)
+            throw error
         }
     }
     async update(payload: UserUpdateProfileDTO, user: User) {
@@ -138,7 +158,7 @@ export class UserService {
             })
             return updateUser
         } catch (error) {
-            throw_error(error)
+            throw error
         }
     }
     async changePassword(payload: UserChangePasswordDTO, user: User) {
@@ -166,7 +186,7 @@ export class UserService {
             })
             return updateUser
         } catch (error) {
-            throw_error(error)
+            throw error
         }
     }
 }
